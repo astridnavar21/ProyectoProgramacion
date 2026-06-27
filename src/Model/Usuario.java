@@ -64,4 +64,8 @@ public class Usuario {
     public void setActivo(boolean activo) {
         this.activo = activo;
     }
+
+    public boolean esAdmin() { return "ADMIN".equals(rol); }
+    public boolean esProfesor() { return "PROFESOR".equals(rol); }
+    public boolean esEstudiante() { return "ESTUDIANTE".equals(rol); }
 }
