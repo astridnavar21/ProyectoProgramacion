@@ -4,6 +4,7 @@ import Controller.UsuarioController;
 import DAO.Conexion;
 import Model.Usuario;
 import Vista.Login;
+import Vista.Menu;
 import Vista.VistaUsuario;
 
 import javax.swing.*;
@@ -24,23 +25,15 @@ public class Main {
 
             Login login = new Login(null, controller);
             login.setVisible(true);
-        });
 
-        SwingUtilities.invokeLater(() -> {
+            Usuario usuario = login.getUsuario();
+            if (usuario != null) {
 
-            UsuarioController controller = new UsuarioController();
-
-            Usuario usuarioActual = new Usuario();
-            usuarioActual.setRol("ADMIN");
-
-            JFrame frame = new JFrame("Gestión de Usuarios");
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-            frame.setSize(900, 600);
-            frame.setLocationRelativeTo(null);
-
-            frame.setContentPane(new VistaUsuario(controller, usuarioActual));
-
-            frame.setVisible(true);
+                Menu mainFrame = new Menu(usuario, new UsuarioController());
+                mainFrame.setVisible(true);
+            } else {
+                System.exit(0);
+            }
         });
     }
 }
