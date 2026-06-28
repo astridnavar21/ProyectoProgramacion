@@ -14,7 +14,7 @@ public class Menu extends JFrame {
     public Menu(Usuario usuario,
                      UsuarioController usuarioController) {
         this.usuario = usuario;
-        setTitle("Sistema de Registro de Notas - " + usuario.getUsuario() + " (" + usuario.getRol() + ")");
+        setTitle("Sistema de Gestión Académica Universitaria - " + usuario.getUsuario() + " (" + usuario.getRol() + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 650);
         setLocationRelativeTo(null);
@@ -23,7 +23,10 @@ public class Menu extends JFrame {
         contentPane = new JPanel(cardLayout);
 
         VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
-
+        VistaEstudiante vistaEstudiante = new VistaEstudiante(new Controller.EstudianteController(), usuario);
+        VistaProfesor vistaProfesor = new VistaProfesor(new Controller.ProfesorController(), usuario);
+        contentPane.add(vistaEstudiante, "Estudiantes");
+        contentPane.add(vistaProfesor, "Profesores");
         contentPane.add(vistaUsuario, "Usuarios");
 
         add(contentPane, BorderLayout.CENTER);
