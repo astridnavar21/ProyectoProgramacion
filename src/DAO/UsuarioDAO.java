@@ -1,6 +1,7 @@
 package DAO;
 
 import Model.Usuario;
+import Util.PasswordUtil;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class UsuarioDAO implements IDAO<Usuario> {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, username);
-                ps.setString(2, password);
+                ps.setString(2, PasswordUtil.hashPassword(password));
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) return mapear(rs);
                 }
@@ -107,7 +108,7 @@ public class UsuarioDAO implements IDAO<Usuario> {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
                 ps.setString(1, u.getUsuario());
-                ps.setString(2, u.getContrasena());
+                ps.setString(2, PasswordUtil.hashPassword(u.getContrasena()));
                 ps.setString(3, u.getRol());
                 if (u.getProfesorId() != null) ps.setInt(4, u.getProfesorId());
                 else ps.setNull(4, Types.INTEGER);
@@ -122,19 +123,28 @@ public class UsuarioDAO implements IDAO<Usuario> {
 
     @Override
     public void actualizar(Usuario u) {
-        String sql = "UPDATE usuarios SET usuario = ?, contrasena = ?, rol = ?, profesor_id = ?, estudiante_id = ?, activo = ? WHERE id_usuario = ?";
+        String sql;
+        boolean cambiarPass = u.getContrasena() != null && !u.getContrasena().isEmpty();
+        if (cambiarPass) {
+            sql = "UPDATE usuarios SET usuario = ?, contrasena = ?, rol = ?, profesor_id = ?, estudiante_id = ?, activo = ? WHERE id_usuario = ?";
+        } else {
+            sql = "UPDATE usuarios SET usuario = ?, rol = ?, profesor_id = ?, estudiante_id = ?, activo = ? WHERE id_usuario = ?";
+        }
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
-                ps.setString(1, u.getUsuario());
-                ps.setString(2, u.getContrasena());
-                ps.setString(3, u.getRol());
-                if (u.getProfesorId() != null) ps.setInt(4, u.getProfesorId());
-                else ps.setNull(4, Types.INTEGER);
-                if (u.getEstudianteId() != null) ps.setInt(5, u.getEstudianteId());
-                else ps.setNull(5, Types.INTEGER);
-                ps.setBoolean(6, u.isActivo());
-                ps.setInt(7, u.getId());
+                int idx = 1;
+                ps.setString(idx++, u.getUsuario());
+                if (cambiarPass) {
+                    ps.setString(idx++, PasswordUtil.hashPassword(u.getContrasena()));
+                }
+                ps.setString(idx++, u.getRol());
+                if (u.getProfesorId() != null) ps.setInt(idx++, u.getProfesorId());
+                else ps.setNull(idx++, Types.INTEGER);
+                if (u.getEstudianteId() != null) ps.setInt(idx++, u.getEstudianteId());
+                else ps.setNull(idx++, Types.INTEGER);
+                ps.setBoolean(idx++, u.isActivo());
+                ps.setInt(idx, u.getId());
                 ps.executeUpdate();
             }
         } catch (SQLException e) {

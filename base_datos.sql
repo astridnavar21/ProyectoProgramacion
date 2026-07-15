@@ -55,7 +55,7 @@ CREATE TABLE calificaciones (
 CREATE TABLE usuarios (
                           id_usuario INT AUTO_INCREMENT PRIMARY KEY,
                           usuario VARCHAR(50) NOT NULL,
-                          contrasena VARCHAR(50) NOT NULL,
+                          contrasena VARCHAR(256) NOT NULL,
                           rol VARCHAR(20) NOT NULL,
                           profesor_id INT,
                           estudiante_id INT,
@@ -65,10 +65,10 @@ CREATE TABLE usuarios (
 );
 
 INSERT INTO usuarios (usuario, contrasena, rol)
-VALUES ('admin', '1234', 'ADMIN');
+VALUES ('admin', SHA2('1234', 256), 'ADMIN');
 
 INSERT INTO usuarios (usuario, contrasena, rol)
-VALUES ('Astrid', '5678', 'PROFESOR');
+VALUES ('Astrid', SHA2('5678', 256), 'PROFESOR');
 
 INSERT INTO usuarios (usuario, contrasena, rol)
-VALUES ('Daniela', '1200', 'ESTUDIANTE');
+VALUES ('Daniela', SHA2('1200', 256), 'ESTUDIANTE');

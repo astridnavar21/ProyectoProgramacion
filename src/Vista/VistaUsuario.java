@@ -193,7 +193,7 @@ public class VistaUsuario extends JPanel {
         if (u != null) {
             idActual = u.getId();
             txtUsername.setText(u.getUsuario());
-            txtPassword.setText(u.getContrasena());
+            txtPassword.setText("");
             cmbRol.setSelectedItem(u.getRol());
             chkActivo.setSelected(u.isActivo());
 

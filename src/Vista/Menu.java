@@ -38,6 +38,10 @@ public class Menu extends JFrame {
         JMenuBar menuBar = new JMenuBar();
 
         JMenu archivoMenu = new JMenu("Archivo");
+        JMenuItem cerrarSesionItem = new JMenuItem("Cerrar Sesión");
+        cerrarSesionItem.addActionListener(e -> cerrarSesion());
+        archivoMenu.add(cerrarSesionItem);
+        archivoMenu.addSeparator();
         JMenuItem salirItem = new JMenuItem("Salir");
         salirItem.addActionListener(e -> System.exit(0));
         archivoMenu.add(salirItem);
@@ -68,5 +72,20 @@ public class Menu extends JFrame {
         }
 
         setJMenuBar(menuBar);
+    }
+
+    private void cerrarSesion() {
+        dispose();
+        SwingUtilities.invokeLater(() -> {
+            UsuarioController controller = new UsuarioController();
+            Login login = new Login(null, controller);
+            login.setVisible(true);
+            Usuario nuevoUsuario = login.getUsuario();
+            if (nuevoUsuario != null) {
+                new Menu(nuevoUsuario, controller).setVisible(true);
+            } else {
+                System.exit(0);
+            }
+        });
     }
 }
