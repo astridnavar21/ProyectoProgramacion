@@ -13,11 +13,12 @@ public class UsuarioDAO implements IDAO<Usuario> {
     public List<Usuario> listar() {
         List<Usuario> lista = new ArrayList<>();
         String sql = "SELECT u.*, " +
-                     "COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT(e.nombre, ' ', e.apellido)) AS nombre_asociado " +
-                     "FROM usuarios u " +
-                     "LEFT JOIN profesores p ON u.profesor_id = p.id_profesor " +
-                     "LEFT JOIN estudiantes e ON u.estudiante_id = e.id_estudiante " +
-                     "ORDER BY u.usuario";
+                "COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT(e.nombre, ' ', e.apellido)) AS nombre_asociado " +
+                "FROM usuarios u " +
+                "LEFT JOIN profesores p ON u.profesor_id = p.id_profesor " +
+                "LEFT JOIN estudiantes e ON u.estudiante_id = e.id_estudiante " +
+                "WHERE u.activo = true " +
+                "ORDER BY u.usuario";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (Statement stmt = conn.createStatement();
