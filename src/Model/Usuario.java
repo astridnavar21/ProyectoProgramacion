@@ -7,6 +7,7 @@ public class Usuario {
     private String rol;
     private Integer profesorId;
     private Integer estudianteId;
+    private String nombreAsociado; // solo para visualización en tabla
     private boolean activo;
 
     public int getId() {
@@ -63,6 +64,14 @@ public class Usuario {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getNombreAsociado() {
+        return nombreAsociado;
+    }
+
+    public void setNombreAsociado(String nombreAsociado) {
+        this.nombreAsociado = nombreAsociado;
     }
 
     public boolean esAdmin() {

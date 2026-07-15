@@ -1,6 +1,10 @@
 package Vista;
 
+import Controller.EstudianteController;
+import Controller.ProfesorController;
 import Controller.UsuarioController;
+import Model.Estudiante;
+import Model.Profesor;
 import Model.Usuario;
 
 import javax.swing.*;
@@ -9,15 +13,22 @@ import java.awt.*;
 
 public class VistaUsuario extends JPanel {
     private final UsuarioController controller;
+    private final ProfesorController profesorController = new ProfesorController();
+    private final EstudianteController estudianteController = new EstudianteController();
     private final Usuario usuario;
     private JTable table;
     private DefaultTableModel tableModel;
-    private static final String[] COLUMNAS = {"ID", "Usuario", "Rol", "Activo"};
+    private static final String[] COLUMNAS = {"ID", "Usuario", "Rol", "Asociado", "Activo"};
 
     private JTextField txtUsername;
     private JPasswordField txtPassword;
     private JComboBox<String> cmbRol;
     private JCheckBox chkActivo;
+
+    private JLabel lblAsociado;
+    private JComboBox<Profesor> cmbProfesor;
+    private JComboBox<Estudiante> cmbEstudiante;
+
     private int idActual = -1;
 
     public VistaUsuario(UsuarioController controller, Usuario usuario) {
@@ -42,6 +53,7 @@ public class VistaUsuario extends JPanel {
         gbc.insets = new Insets(3, 5, 3, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        // Fila 0: Usuario | Rol
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Usuario:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -53,6 +65,7 @@ public class VistaUsuario extends JPanel {
         cmbRol = new JComboBox<>(new String[]{"ADMIN", "PROFESOR", "ESTUDIANTE"});
         fields.add(cmbRol, gbc);
 
+        // Fila 1: Contraseña | Activo
         gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Contraseña:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -62,6 +75,21 @@ public class VistaUsuario extends JPanel {
         chkActivo = new JCheckBox("Activo");
         chkActivo.setSelected(true);
         fields.add(chkActivo, gbc);
+
+        // Fila 2: Profesor / Estudiante (según rol)
+        gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
+        lblAsociado = new JLabel("Profesor:");
+        fields.add(lblAsociado, gbc);
+        gbc.gridx = 1; gbc.gridwidth = 3; gbc.anchor = GridBagConstraints.WEST;
+
+        JPanel comboPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        cmbProfesor = new JComboBox<>();
+        cmbProfesor.setPreferredSize(new Dimension(250, 25));
+        cmbEstudiante = new JComboBox<>();
+        cmbEstudiante.setPreferredSize(new Dimension(250, 25));
+        comboPanel.add(cmbProfesor);
+        comboPanel.add(cmbEstudiante);
+        fields.add(comboPanel, gbc);
 
         formPanel.add(fields, BorderLayout.CENTER);
 
@@ -80,11 +108,58 @@ public class VistaUsuario extends JPanel {
 
         add(formPanel, BorderLayout.NORTH);
 
+        // Cargar datos en los combos
+        cargarComboProfesores();
+        cargarComboEstudiantes();
+
+        // Estado inicial: ADMIN seleccionado, ocultar combos de asociado
+        actualizarVisibilidadAsociado();
+
+        // Eventos
+        cmbRol.addActionListener(e -> actualizarVisibilidadAsociado());
         btnNuevo.addActionListener(e -> limpiarFormulario());
         btnGuardar.addActionListener(e -> guardar());
         btnEliminar.addActionListener(e -> eliminar());
         btnCancelar.addActionListener(e -> cancelar());
         btnRefrescar.addActionListener(e -> cargarTabla());
+    }
+
+    private void cargarComboProfesores() {
+        DefaultComboBoxModel<Profesor> model = new DefaultComboBoxModel<>();
+        for (Profesor p : profesorController.listar()) {
+            model.addElement(p);
+        }
+        cmbProfesor.setModel(model);
+    }
+
+    private void cargarComboEstudiantes() {
+        DefaultComboBoxModel<Estudiante> model = new DefaultComboBoxModel<>();
+        for (Estudiante e : estudianteController.listar()) {
+            model.addElement(e);
+        }
+        cmbEstudiante.setModel(model);
+    }
+
+    /**
+     * Muestra/oculta el selector de profesor o estudiante según el rol seleccionado.
+     * ADMIN → oculta todo
+     * PROFESOR → muestra combo de profesores
+     * ESTUDIANTE → muestra combo de estudiantes
+     */
+    private void actualizarVisibilidadAsociado() {
+        String rol = (String) cmbRol.getSelectedItem();
+        boolean esProfesor = "PROFESOR".equals(rol);
+        boolean esEstudiante = "ESTUDIANTE".equals(rol);
+
+        lblAsociado.setVisible(esProfesor || esEstudiante);
+        cmbProfesor.setVisible(esProfesor);
+        cmbEstudiante.setVisible(esEstudiante);
+
+        if (esProfesor) {
+            lblAsociado.setText("Profesor:");
+        } else if (esEstudiante) {
+            lblAsociado.setText("Estudiante:");
+        }
     }
 
     private void initTable() {
@@ -105,7 +180,10 @@ public class VistaUsuario extends JPanel {
     private void cargarTabla() {
         tableModel.setRowCount(0);
         for (Usuario u : controller.listar()) {
-            tableModel.addRow(new Object[]{u.getId(), u.getUsuario(), u.getRol(), u.isActivo() ? "Sí" : "No"});
+            String asociado = u.getNombreAsociado() != null ? u.getNombreAsociado() : "";
+            tableModel.addRow(new Object[]{
+                    u.getId(), u.getUsuario(), u.getRol(), asociado, u.isActivo() ? "Sí" : "No"
+            });
         }
     }
 
@@ -118,6 +196,24 @@ public class VistaUsuario extends JPanel {
             txtPassword.setText(u.getContrasena());
             cmbRol.setSelectedItem(u.getRol());
             chkActivo.setSelected(u.isActivo());
+
+            // Seleccionar el profesor o estudiante correspondiente en el combo
+            if (u.getProfesorId() != null) {
+                for (int i = 0; i < cmbProfesor.getItemCount(); i++) {
+                    if (cmbProfesor.getItemAt(i).getId() == u.getProfesorId()) {
+                        cmbProfesor.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
+            if (u.getEstudianteId() != null) {
+                for (int i = 0; i < cmbEstudiante.getItemCount(); i++) {
+                    if (cmbEstudiante.getItemAt(i).getId() == u.getEstudianteId()) {
+                        cmbEstudiante.setSelectedIndex(i);
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -127,6 +223,22 @@ public class VistaUsuario extends JPanel {
             JOptionPane.showMessageDialog(this, "El nombre de usuario es obligatorio.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
+
+        String rol = (String) cmbRol.getSelectedItem();
+
+        // Validar que se haya seleccionado profesor o estudiante según el rol
+        if ("PROFESOR".equals(rol)) {
+            if (cmbProfesor.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un profesor para el rol PROFESOR.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else if ("ESTUDIANTE".equals(rol)) {
+            if (cmbEstudiante.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un estudiante para el rol ESTUDIANTE.", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        }
+
         Usuario u = new Usuario();
         u.setUsuario(txtUsername.getText().trim());
 
@@ -134,7 +246,14 @@ public class VistaUsuario extends JPanel {
         if (!pass.isEmpty() || idActual == -1) {
             u.setContrasena(pass);
         }
-        u.setRol((String) cmbRol.getSelectedItem());
+        u.setRol(rol);
+
+        // Asignar profesorId o estudianteId según el rol
+        if ("PROFESOR".equals(rol) && cmbProfesor.getSelectedItem() != null) {
+            u.setProfesorId(((Profesor) cmbProfesor.getSelectedItem()).getId());
+        } else if ("ESTUDIANTE".equals(rol) && cmbEstudiante.getSelectedItem() != null) {
+            u.setEstudianteId(((Estudiante) cmbEstudiante.getSelectedItem()).getId());
+        }
 
         String error;
         if (idActual == -1) {
@@ -181,6 +300,10 @@ public class VistaUsuario extends JPanel {
             txtPassword.setText("");
             cmbRol.setSelectedIndex(0);
             chkActivo.setSelected(true);
+            // Resetear combos al primer elemento
+            if (cmbProfesor.getItemCount() > 0) cmbProfesor.setSelectedIndex(0);
+            if (cmbEstudiante.getItemCount() > 0) cmbEstudiante.setSelectedIndex(0);
+            actualizarVisibilidadAsociado();
             txtUsername.requestFocus();
         }
     }

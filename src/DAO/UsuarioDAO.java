@@ -11,7 +11,12 @@ public class UsuarioDAO implements IDAO<Usuario> {
     @Override
     public List<Usuario> listar() {
         List<Usuario> lista = new ArrayList<>();
-        String sql = "SELECT * FROM usuarios ORDER BY usuario";
+        String sql = "SELECT u.*, " +
+                     "COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT(e.nombre, ' ', e.apellido)) AS nombre_asociado " +
+                     "FROM usuarios u " +
+                     "LEFT JOIN profesores p ON u.profesor_id = p.id_profesor " +
+                     "LEFT JOIN estudiantes e ON u.estudiante_id = e.id_estudiante " +
+                     "ORDER BY u.usuario";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (Statement stmt = conn.createStatement();
@@ -26,7 +31,12 @@ public class UsuarioDAO implements IDAO<Usuario> {
 
     @Override
     public Usuario obtenerPorId(int id) {
-        String sql = "SELECT * FROM usuarios WHERE id_usuario = ?";
+        String sql = "SELECT u.*, " +
+                     "COALESCE(CONCAT(p.nombre, ' ', p.apellido), CONCAT(e.nombre, ' ', e.apellido)) AS nombre_asociado " +
+                     "FROM usuarios u " +
+                     "LEFT JOIN profesores p ON u.profesor_id = p.id_profesor " +
+                     "LEFT JOIN estudiantes e ON u.estudiante_id = e.id_estudiante " +
+                     "WHERE u.id_usuario = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -157,6 +167,11 @@ public class UsuarioDAO implements IDAO<Usuario> {
         int estId = rs.getInt("estudiante_id");
         u.setEstudianteId(rs.wasNull() ? null : estId);
         u.setActivo(rs.getBoolean("activo"));
+        try {
+            u.setNombreAsociado(rs.getString("nombre_asociado"));
+        } catch (SQLException ignored) {
+            // columna nombre_asociado no existe en consultas sin JOIN
+        }
         return u;
     }
 }
