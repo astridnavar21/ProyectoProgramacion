@@ -22,16 +22,19 @@ public class Menu extends JFrame {
         cardLayout = new CardLayout();
         contentPane = new JPanel(cardLayout);
 
-        VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
         VistaEstudiante vistaEstudiante = new VistaEstudiante(new Controller.EstudianteController(), usuario);
         VistaProfesor vistaProfesor = new VistaProfesor(new Controller.ProfesorController(), usuario);
         contentPane.add(vistaEstudiante, "Estudiantes");
         contentPane.add(vistaProfesor, "Profesores");
-        contentPane.add(vistaUsuario, "Usuarios");
+
+        if (usuario.esAdmin()) {
+            VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
+            contentPane.add(vistaUsuario, "Usuarios");
+        }
 
         add(contentPane, BorderLayout.CENTER);
         initMenuBar();
-        cardLayout.show(contentPane, "Usuarios");
+        cardLayout.show(contentPane, usuario.esAdmin() ? "Usuarios" : "Estudiantes");
     }
 
     private void initMenuBar() {
