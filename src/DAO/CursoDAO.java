@@ -11,7 +11,7 @@ public class CursoDAO implements IDAO<Curso>{
     public List<Curso> listar() {
         List<Curso> lista = new ArrayList<>();
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
-                "FROM cursos c LEFT JOIN profesores p ON c.profesor_id = p.id " +
+                "FROM cursos c LEFT JOIN profesores p ON c.id_profesor = p.id_profesor " +
                 "WHERE c.activo = true ORDER BY c.nombre";
         try {
             Connection conn = Conexion.getInstance().getConnection();
@@ -28,8 +28,8 @@ public class CursoDAO implements IDAO<Curso>{
     public List<Curso> listarPorProfesorId(int profesorId) {
         List<Curso> lista = new ArrayList<>();
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
-                "FROM cursos c LEFT JOIN profesores p ON c.profesor_id = p.id " +
-                "WHERE c.activo = true AND c.profesor_id = ? ORDER BY c.nombre";
+                "FROM cursos c LEFT JOIN profesores p ON c.id_profesor = p.id_profesor " +
+                "WHERE c.activo = true AND c.id_profesor = ? ORDER BY c.nombre";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -48,9 +48,9 @@ public class CursoDAO implements IDAO<Curso>{
         List<Curso> lista = new ArrayList<>();
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
                 "FROM cursos c " +
-                "LEFT JOIN profesores p ON c.profesor_id = p.id " +
-                "JOIN matriculas m ON c.id = m.curso_id " +
-                "WHERE c.activo = true AND m.estudiante_id = ? AND m.activo = true " +
+                "LEFT JOIN profesores p ON c.id_profesor = p.id_profesor " +
+                "JOIN matriculas m ON c.id = m.id_curso " +
+                "WHERE c.activo = true AND m.id_estudiante = ? AND m.activo = true " +
                 "ORDER BY c.nombre";
         try {
             Connection conn = Conexion.getInstance().getConnection();
@@ -69,7 +69,7 @@ public class CursoDAO implements IDAO<Curso>{
     @Override
     public Curso obtenerPorId(int id) {
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
-                "FROM cursos c LEFT JOIN profesores p ON c.profesor_id = p.id WHERE c.id = ?";
+                "FROM cursos c LEFT JOIN profesores p ON c.id_profesor = p.id_profesor WHERE c.id = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -86,7 +86,7 @@ public class CursoDAO implements IDAO<Curso>{
 
     @Override
     public void guardar(Curso curso) {
-        String sql = "INSERT INTO cursos (nombre, descripcion, creditos, profesor_id, cupo_maximo) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO cursos (nombre, descripcion, creditos, id_profesor, cupo_maximo) VALUES (?, ?, ?, ?, ?)";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,7 +104,7 @@ public class CursoDAO implements IDAO<Curso>{
 
     @Override
     public void actualizar(Curso curso) {
-        String sql = "UPDATE cursos SET nombre = ?, descripcion = ?, creditos = ?, profesor_id = ?, cupo_maximo = ? WHERE id = ?";
+        String sql = "UPDATE cursos SET nombre = ?, descripcion = ?, creditos = ?, id_profesor = ?, cupo_maximo = ? WHERE id = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -141,7 +141,7 @@ public class CursoDAO implements IDAO<Curso>{
         c.setNombre(rs.getString("nombre"));
         c.setDescripcion(rs.getString("descripcion"));
         c.setCreditos(rs.getInt("creditos"));
-        c.setProfesorId(rs.getInt("profesor_id"));
+        c.setProfesorId(rs.getInt("id_profesor"));
         c.setNombreProfesor(rs.getString("nombre_profesor"));
         c.setCupoMaximo(rs.getInt("cupo_maximo"));
         c.setActivo(rs.getBoolean("activo"));

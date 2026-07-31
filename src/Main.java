@@ -1,5 +1,8 @@
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import Controller.CursoController;
+import Controller.EstudianteController;
+import Controller.ProfesorController;
 import Controller.UsuarioController;
 import DAO.Conexion;
 import Model.Usuario;
@@ -28,6 +31,9 @@ public class Main {
 
             Usuario usuario = login.getUsuario();
             if (usuario != null) {
+                CursoController cursoController = new CursoController();
+                EstudianteController estudianteController = new EstudianteController();
+                ProfesorController profesorController = new ProfesorController();
 
                 Menu mainFrame = new Menu(usuario, new UsuarioController());
                 mainFrame.setVisible(true);

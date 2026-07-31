@@ -1,5 +1,8 @@
 package Vista;
 
+import Controller.CursoController;
+import Controller.EstudianteController;
+import Controller.ProfesorController;
 import Controller.UsuarioController;
 import Model.Usuario;
 
@@ -12,7 +15,7 @@ public class Menu extends JFrame {
     private final Usuario usuario;
 
     public Menu(Usuario usuario,
-                     UsuarioController usuarioController) {
+                UsuarioController usuarioController) {
         this.usuario = usuario;
         setTitle("Sistema de Gestión Académica Universitaria - " + usuario.getUsuario() + " (" + usuario.getRol() + ")");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -24,17 +27,17 @@ public class Menu extends JFrame {
 
         VistaEstudiante vistaEstudiante = new VistaEstudiante(new Controller.EstudianteController(), usuario);
         VistaProfesor vistaProfesor = new VistaProfesor(new Controller.ProfesorController(), usuario);
+        VistaCurso vistaCurso = new VistaCurso(new Controller.CursoController(), new Controller.ProfesorController(), usuario);
+        VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
+
         contentPane.add(vistaEstudiante, "Estudiantes");
         contentPane.add(vistaProfesor, "Profesores");
-
-        if (usuario.esAdmin()) {
-            VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
-            contentPane.add(vistaUsuario, "Usuarios");
-        }
+        contentPane.add(vistaCurso, "Cursos");
+        contentPane.add(vistaUsuario, "Usuarios");
 
         add(contentPane, BorderLayout.CENTER);
         initMenuBar();
-        cardLayout.show(contentPane, usuario.esAdmin() ? "Usuarios" : "Estudiantes");
+        cardLayout.show(contentPane, "Cursos");
     }
 
     private void initMenuBar() {
@@ -50,6 +53,9 @@ public class Menu extends JFrame {
         archivoMenu.add(salirItem);
 
         JMenu catalogMenu = new JMenu("Catálogo");
+        JMenuItem cursosItem = new JMenuItem("Cursos");
+        cursosItem.addActionListener(e -> cardLayout.show(contentPane, "Cursos"));
+        catalogMenu.add(cursosItem);
 
         if (usuario.esAdmin() || usuario.esProfesor()) {
             JMenuItem estudiantesItem = new JMenuItem("Estudiantes");
