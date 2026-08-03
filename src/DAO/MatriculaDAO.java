@@ -53,9 +53,10 @@ public class MatriculaDAO implements IDAO<Matricula> {
         List<Matricula> lista = new ArrayList<>();
         String sql = "SELECT m.*, CONCAT(e.nombre, ' ', e.apellido) AS nombre_estudiante, cu.nombre AS nombre_curso " +
                 "FROM matriculas m " +
-                "JOIN estudiantes e ON m.id_estudiante = e.id_estudiante" +
-                "JOIN cursos cu ON m.curso_id = cu.id " +
-                "WHERE cu.profesor_id = ? " +
+                "JOIN estudiantes e ON " +
+                "m.id_estudiante = e.id_estudiante " +
+                "JOIN cursos cu ON m.id_curso = cu.id_curso " +
+                "WHERE cu.id_profesor = ? " +
                 "ORDER BY m.fecha_matricula DESC";
         try {
             Connection conn = Conexion.getInstance().getConnection();
@@ -108,9 +109,10 @@ public class MatriculaDAO implements IDAO<Matricula> {
     public Matricula obtenerPorId(int id) {
         String sql = "SELECT m.*, CONCAT(e.nombre, ' ', e.apellido) AS nombre_estudiante, cu.nombre AS nombre_curso " +
                 "FROM matriculas m " +
-                "JOIN estudiantes e ON m.id_estudiante = e.id_estudiante" +
-                "JOIN cursos cu ON m.curso_id = cu.id " +
-                "WHERE m.id = ?";
+                "JOIN estudiantes e ON " +
+                "m.id_estudiante = e.id_estudiante " +
+                "JOIN cursos cu ON m.id_curso = cu.id_curso " +
+                "WHERE m.id_matricula = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -143,7 +145,7 @@ public class MatriculaDAO implements IDAO<Matricula> {
 
     @Override
     public void actualizar(Matricula m) {
-        String sql = "UPDATE matriculas SET id_estudiante = ?, id_curso = ?, fecha_matricula = ?, activo = ? WHERE id = ?";
+        String sql = "UPDATE matriculas SET id_estudiante = ?, id_curso = ?, fecha_matricula = ?, activo = ? WHERE id_matricula = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -161,7 +163,7 @@ public class MatriculaDAO implements IDAO<Matricula> {
 
     @Override
     public void eliminar(int id) {
-        String sql = "DELETE FROM matriculas WHERE id = ?";
+        String sql = "DELETE FROM matriculas WHERE id_matricula = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -175,7 +177,7 @@ public class MatriculaDAO implements IDAO<Matricula> {
 
     private Matricula mapear(ResultSet rs) throws SQLException {
         Matricula m = new Matricula();
-        m.setId(rs.getInt("id"));
+        m.setId(rs.getInt("id_matricula"));
         m.setEstudianteId(rs.getInt("id_estudiante"));
         m.setCursoId(rs.getInt("id_curso"));
         Date fm = rs.getDate("fecha_matricula");

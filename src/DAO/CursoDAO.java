@@ -49,7 +49,7 @@ public class CursoDAO implements IDAO<Curso>{
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
                 "FROM cursos c " +
                 "LEFT JOIN profesores p ON c.id_profesor = p.id_profesor " +
-                "JOIN matriculas m ON c.id = m.id_curso " +
+                "JOIN matriculas m ON c.id_curso = m.id_curso " +
                 "WHERE c.activo = true AND m.id_estudiante = ? AND m.activo = true " +
                 "ORDER BY c.nombre";
         try {
@@ -69,7 +69,7 @@ public class CursoDAO implements IDAO<Curso>{
     @Override
     public Curso obtenerPorId(int id) {
         String sql = "SELECT c.*, COALESCE(CONCAT(p.nombre, ' ', p.apellido), '—') AS nombre_profesor " +
-                "FROM cursos c LEFT JOIN profesores p ON c.id_profesor = p.id_profesor WHERE c.id = ?";
+                "FROM cursos c LEFT JOIN profesores p ON c.id_profesor = p.id_profesor WHERE c.id_curso = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -104,7 +104,7 @@ public class CursoDAO implements IDAO<Curso>{
 
     @Override
     public void actualizar(Curso curso) {
-        String sql = "UPDATE cursos SET nombre = ?, descripcion = ?, creditos = ?, id_profesor = ?, cupo_maximo = ? WHERE id = ?";
+        String sql = "UPDATE cursos SET nombre = ?, descripcion = ?, creditos = ?, id_profesor = ?, cupo_maximo = ? WHERE id_curso = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -123,7 +123,7 @@ public class CursoDAO implements IDAO<Curso>{
 
     @Override
     public void eliminar(int id) {
-        String sql = "UPDATE cursos SET activo = false WHERE id = ?";
+        String sql = "UPDATE cursos SET activo = false WHERE id_curso = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -137,7 +137,7 @@ public class CursoDAO implements IDAO<Curso>{
 
     private Curso mapear(ResultSet rs) throws SQLException {
         Curso c = new Curso();
-        c.setId(rs.getInt("id"));
+        c.setId(rs.getInt("id_curso"));
         c.setNombre(rs.getString("nombre"));
         c.setDescripcion(rs.getString("descripcion"));
         c.setCreditos(rs.getInt("creditos"));

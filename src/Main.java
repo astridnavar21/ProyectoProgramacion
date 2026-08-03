@@ -1,9 +1,6 @@
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-import Controller.CursoController;
-import Controller.EstudianteController;
-import Controller.ProfesorController;
-import Controller.UsuarioController;
+import Controller.*;
 import DAO.Conexion;
 import Model.Usuario;
 import Vista.Login;
@@ -34,6 +31,8 @@ public class Main {
                 CursoController cursoController = new CursoController();
                 EstudianteController estudianteController = new EstudianteController();
                 ProfesorController profesorController = new ProfesorController();
+                CalificacionController calificacionController = new CalificacionController();
+                MatriculaController matriculaController = new MatriculaController(cursoController);
 
                 Menu mainFrame = new Menu(usuario, new UsuarioController());
                 mainFrame.setVisible(true);

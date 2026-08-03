@@ -13,8 +13,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
         String sql = "SELECT c.*, CONCAT(e.nombre, ' ', e.apellido) AS nombre_estudiante, cu.nombre AS nombre_curso " +
                 "FROM calificaciones c " +
                 "JOIN estudiantes e ON c.id_estudiante = e.id_estudiante " +
-                "JOIN cursos cu ON c. id_curso = cu. id_curso " +
-                "ORDER BY c.fecha_registro DESC";
+                "JOIN cursos cu ON c. id_curso = cu. id_curso ";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (Statement stmt = conn.createStatement();
@@ -33,8 +32,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
                 "FROM calificaciones c " +
                 "JOIN estudiantes e ON c.id_estudiante = e.id_estudiante " +
                 "JOIN cursos cu ON c. id_curso = cu. id_curso " +
-                "WHERE c.id_estudiante = ? " +
-                "ORDER BY c.fecha_registro DESC";
+                "WHERE c.id_estudiante = ? ";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -55,8 +53,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
                 "FROM calificaciones c " +
                 "JOIN estudiantes e ON c.id_estudiante = e.id_estudiante " +
                 "JOIN cursos cu ON c. id_curso = cu. id_curso " +
-                "WHERE cu.id_profesor = ? " +
-                "ORDER BY c.fecha_registro DESC";
+                "WHERE cu.id_profesor = ? ";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -72,7 +69,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
     }
 
     public double calcularPromedioPorEstudiante(int estudianteId) {
-        String sql = "SELECT COALESCE(AVG(calificacion), 0) FROM calificaciones WHERE id_estudiante = ?";
+        String sql = "SELECT COALESCE(AVG(nota), 0) FROM calificaciones WHERE id_estudiante = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -93,7 +90,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
                 "FROM calificaciones c " +
                 "JOIN estudiantes e ON c.id_estudiante = e.id_estudiante " +
                 "JOIN cursos cu ON c. id_curso = cu. id_curso " +
-                "WHERE c.id = ?";
+                "WHERE c.id_calificacion = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -110,7 +107,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
 
     @Override
     public void guardar(Calificacion c) {
-        String sql = "INSERT INTO calificaciones (id_estudiante,  id_curso, calificacion) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO calificaciones (id_estudiante,  id_curso, nota) VALUES (?, ?, ?)";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -126,7 +123,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
 
     @Override
     public void actualizar(Calificacion c) {
-        String sql = "UPDATE calificaciones SET id_estudiante = ?,  id_curso = ?, calificacion = ? WHERE id = ?";
+        String sql = "UPDATE calificaciones SET id_estudiante = ?,  id_curso = ?, nota = ? WHERE id_calificacion = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -143,7 +140,7 @@ public class CalificacionDAO implements IDAO<Calificacion>{
 
     @Override
     public void eliminar(int id) {
-        String sql = "DELETE FROM calificaciones WHERE id = ?";
+        String sql = "DELETE FROM calificaciones WHERE id_calificacion = ?";
         try {
             Connection conn = Conexion.getInstance().getConnection();
             try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -157,12 +154,10 @@ public class CalificacionDAO implements IDAO<Calificacion>{
 
     private Calificacion mapear(ResultSet rs) throws SQLException {
         Calificacion c = new Calificacion();
-        c.setId(rs.getInt("id"));
-        c.setEstudianteId(rs.getInt("estudiante_id"));
-        c.setCursoId(rs.getInt("curso_id"));
-        c.setCalificacion(rs.getDouble("calificacion"));
-        Timestamp ts = rs.getTimestamp("fecha_registro");
-        if (ts != null) c.setFechaRegistro(ts.toLocalDateTime());
+        c.setId(rs.getInt("id_calificacion"));
+        c.setEstudianteId(rs.getInt("id_estudiante"));
+        c.setCursoId(rs.getInt("id_curso"));
+        c.setCalificacion(rs.getDouble("nota"));
         c.setNombreEstudiante(rs.getString("nombre_estudiante"));
         c.setNombreCurso(rs.getString("nombre_curso"));
         return c;

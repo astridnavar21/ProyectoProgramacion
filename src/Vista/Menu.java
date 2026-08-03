@@ -1,9 +1,6 @@
 package Vista;
 
-import Controller.CursoController;
-import Controller.EstudianteController;
-import Controller.ProfesorController;
-import Controller.UsuarioController;
+import Controller.*;
 import Model.Usuario;
 
 import javax.swing.*;
@@ -29,11 +26,15 @@ public class Menu extends JFrame {
         VistaProfesor vistaProfesor = new VistaProfesor(new Controller.ProfesorController(), usuario);
         VistaCurso vistaCurso = new VistaCurso(new Controller.CursoController(), new Controller.ProfesorController(), usuario);
         VistaUsuario vistaUsuario = new VistaUsuario(usuarioController, usuario);
+        VistaCalificacion vistaCalificacion = new VistaCalificacion(new CalificacionController(), new EstudianteController(), new CursoController(), usuario);
+        VistaMatricula vistaMatricula = new VistaMatricula(new MatriculaController(new CursoController()), new EstudianteController(), new CursoController(), usuario);
 
         contentPane.add(vistaEstudiante, "Estudiantes");
         contentPane.add(vistaProfesor, "Profesores");
         contentPane.add(vistaCurso, "Cursos");
         contentPane.add(vistaUsuario, "Usuarios");
+        contentPane.add(vistaCalificacion, "Calificaciones");
+        contentPane.add(vistaMatricula, "Matriculas");
 
         add(contentPane, BorderLayout.CENTER);
         initMenuBar();
@@ -69,8 +70,21 @@ public class Menu extends JFrame {
             catalogMenu.add(profesoresItem);
         }
 
+        JMenu registroMenu = new JMenu("Registro");
+
+        if (usuario.esAdmin() || usuario.esProfesor()) {
+            JMenuItem matriculaItem = new JMenuItem("Matrícula");
+            matriculaItem.addActionListener(e -> cardLayout.show(contentPane, "Matriculas"));
+            registroMenu.add(matriculaItem);
+        }
+
+        JMenuItem calificacionesItem = new JMenuItem("Calificaciones");
+        calificacionesItem.addActionListener(e -> cardLayout.show(contentPane, "Calificaciones"));
+        registroMenu.add(calificacionesItem);
+
         menuBar.add(archivoMenu);
         menuBar.add(catalogMenu);
+        menuBar.add(registroMenu);
 
         if (usuario.esAdmin()) {
             JMenu configMenu = new JMenu("Configuración");
