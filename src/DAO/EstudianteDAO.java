@@ -28,7 +28,7 @@ public class EstudianteDAO implements IDAO<Estudiante> {
         List<Estudiante> lista = new ArrayList<>();
         String sql = "SELECT DISTINCT e.* FROM estudiantes e " +
                      "JOIN matriculas m ON e.id_estudiante = m.id_estudiante " +
-                     "JOIN cursos c ON m.curso_id = c.id " +
+                     "JOIN cursos c ON m.id_curso = c.id_curso " +
                      "WHERE c.id_profesor = ? AND e.activo = true AND m.activo = true " +
                      "ORDER BY e.apellido, e.nombre";
         try {
