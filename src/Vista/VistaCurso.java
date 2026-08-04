@@ -9,6 +9,8 @@ import Model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class VistaCurso extends JPanel {
     private final CursoController controller;
@@ -32,8 +34,15 @@ public class VistaCurso extends JPanel {
         this.usuario = usuario;
         setLayout(new BorderLayout(0, 10));
         initForm();
+        cargarComboProfesores();
         initTable();
         cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
     }
 
     private void initForm() {
@@ -61,8 +70,6 @@ public class VistaCurso extends JPanel {
         fields.add(new JLabel("Profesor:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
         cmbProfesor = new JComboBox<>();
-        cmbProfesor.addItem(new Profesor() {{ setId(0); setNombre("—"); setApellido(""); }});
-        for (Profesor p : profesorController.listar()) cmbProfesor.addItem(p);
         fields.add(cmbProfesor, gbc);
         gbc.gridx = 2; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Cupo Máx.:"), gbc);
@@ -110,6 +117,23 @@ public class VistaCurso extends JPanel {
         btnEliminar.addActionListener(e -> eliminar());
         btnCancelar.addActionListener(e -> cancelar());
         btnRefrescar.addActionListener(e -> cargarTabla());
+    }
+
+    public void recargar() {
+        cargarComboProfesores();
+        cargarTabla();
+    }
+
+    private void cargarComboProfesores() {
+        Profesor seleccion = (Profesor) cmbProfesor.getSelectedItem();
+        int idSeleccion = seleccion != null ? seleccion.getId() : 0;
+        cmbProfesor.removeAllItems();
+        cmbProfesor.addItem(new Profesor() {{ setId(0); setNombre("—"); setApellido(""); }});
+        for (Profesor p : profesorController.listar()) {
+            cmbProfesor.addItem(p);
+            if (p.getId() == idSeleccion) cmbProfesor.setSelectedItem(p);
+        }
+        if (idSeleccion == 0 || cmbProfesor.getSelectedItem() == null) cmbProfesor.setSelectedIndex(0);
     }
 
     private void initTable() {

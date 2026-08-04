@@ -8,6 +8,8 @@ import Model.Profesor;
 import Model.Usuario;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class VistaProfesor extends JPanel {
     private final ProfesorController controller;
@@ -26,6 +28,16 @@ public class VistaProfesor extends JPanel {
         setLayout(new BorderLayout(0, 10));
         initForm();
         initTable();
+        cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
+    }
+
+    public void recargar() {
         cargarTabla();
     }
 

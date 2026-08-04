@@ -11,6 +11,8 @@ import Model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
 
 public class VistaMatricula extends JPanel {
@@ -38,9 +40,23 @@ public class VistaMatricula extends JPanel {
 
         if (usuario.esAdmin()) {
             initForm();
+            cargarCombos();
         }
 
         initTable();
+        cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
+    }
+
+    public void recargar() {
+        if (cmbEstudiante != null && cmbCurso != null) {
+            cargarCombos();
+        }
         cargarTabla();
     }
 
@@ -58,14 +74,12 @@ public class VistaMatricula extends JPanel {
         fields.add(new JLabel("Estudiante:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
         cmbEstudiante = new JComboBox<>();
-        for (Estudiante e : estudianteController.listar()) cmbEstudiante.addItem(e);
         fields.add(cmbEstudiante, gbc);
 
         gbc.gridx = 2; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Curso:"), gbc);
         gbc.gridx = 3; gbc.anchor = GridBagConstraints.WEST;
         cmbCurso = new JComboBox<>();
-        for (Curso c : cursoController.listar()) cmbCurso.addItem(c);
         fields.add(cmbCurso, gbc);
 
         // Row 1: Fecha | Activo
@@ -101,6 +115,25 @@ public class VistaMatricula extends JPanel {
         btnEliminar.addActionListener(e -> eliminar());
         btnCancelar.addActionListener(e -> cancelar());
         btnRefrescar.addActionListener(e -> cargarTabla());
+    }
+
+    private void cargarCombos() {
+        int idEstudiante = cmbEstudiante.getSelectedItem() != null ? ((Estudiante) cmbEstudiante.getSelectedItem()).getId() : -1;
+        int idCurso = cmbCurso.getSelectedItem() != null ? ((Curso) cmbCurso.getSelectedItem()).getId() : -1;
+
+        cmbEstudiante.removeAllItems();
+        for (Estudiante e : estudianteController.listar()) {
+            cmbEstudiante.addItem(e);
+            if (e.getId() == idEstudiante) cmbEstudiante.setSelectedItem(e);
+        }
+        if (cmbEstudiante.getSelectedItem() == null && cmbEstudiante.getItemCount() > 0) cmbEstudiante.setSelectedIndex(0);
+
+        cmbCurso.removeAllItems();
+        for (Curso c : cursoController.listar()) {
+            cmbCurso.addItem(c);
+            if (c.getId() == idCurso) cmbCurso.setSelectedItem(c);
+        }
+        if (cmbCurso.getSelectedItem() == null && cmbCurso.getItemCount() > 0) cmbCurso.setSelectedIndex(0);
     }
 
     private void initTable() {

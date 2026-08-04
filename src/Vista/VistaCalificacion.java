@@ -11,6 +11,8 @@ import Model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class VistaCalificacion extends JPanel {
     private final CalificacionController controller;
@@ -41,9 +43,23 @@ public class VistaCalificacion extends JPanel {
             add(lblPromedio, BorderLayout.NORTH);
         } else {
             initForm();
+            cargarCombos();
         }
 
         initTable();
+        cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
+    }
+
+    public void recargar() {
+        if (cmbEstudiante != null && cmbCurso != null) {
+            cargarCombos();
+        }
         cargarTabla();
     }
 
@@ -62,22 +78,12 @@ public class VistaCalificacion extends JPanel {
         fields.add(new JLabel("Estudiante:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
         cmbEstudiante = new JComboBox<>();
-        if (usuario.esAdmin()) {
-            for (Estudiante e : estudianteController.listar()) cmbEstudiante.addItem(e);
-        } else if (usuario.esProfesor() && usuario.getProfesorId() != null) {
-            for (Estudiante e : estudianteController.listarPorCursoProfesor(usuario.getProfesorId())) cmbEstudiante.addItem(e);
-        }
         fields.add(cmbEstudiante, gbc);
 
         gbc.gridx = 2; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Curso:"), gbc);
         gbc.gridx = 3; gbc.anchor = GridBagConstraints.WEST;
         cmbCurso = new JComboBox<>();
-        if (usuario.esAdmin()) {
-            for (Curso c : cursoController.listar()) cmbCurso.addItem(c);
-        } else if (usuario.esProfesor() && usuario.getProfesorId() != null) {
-            for (Curso c : cursoController.listarPorProfesor(usuario.getProfesorId())) cmbCurso.addItem(c);
-        }
         fields.add(cmbCurso, gbc);
 
         // Row 1: Calificación
@@ -117,6 +123,41 @@ public class VistaCalificacion extends JPanel {
         btnEliminar.addActionListener(e -> eliminar());
         btnCancelar.addActionListener(e -> cancelar());
         btnRefrescar.addActionListener(e -> cargarTabla());
+    }
+
+    private void cargarCombos() {
+        int idEstudiante = cmbEstudiante.getSelectedItem() != null ? ((Estudiante) cmbEstudiante.getSelectedItem()).getId() : -1;
+        int idCurso = cmbCurso.getSelectedItem() != null ? ((Curso) cmbCurso.getSelectedItem()).getId() : -1;
+
+        cmbEstudiante.removeAllItems();
+        java.util.List<Estudiante> estudiantes;
+        if (usuario.esAdmin()) {
+            estudiantes = estudianteController.listar();
+        } else if (usuario.esProfesor() && usuario.getProfesorId() != null) {
+            estudiantes = estudianteController.listarPorCursoProfesor(usuario.getProfesorId());
+        } else {
+            estudiantes = new java.util.ArrayList<>();
+        }
+        for (Estudiante e : estudiantes) {
+            cmbEstudiante.addItem(e);
+            if (e.getId() == idEstudiante) cmbEstudiante.setSelectedItem(e);
+        }
+        if (cmbEstudiante.getSelectedItem() == null && cmbEstudiante.getItemCount() > 0) cmbEstudiante.setSelectedIndex(0);
+
+        cmbCurso.removeAllItems();
+        java.util.List<Curso> cursos;
+        if (usuario.esAdmin()) {
+            cursos = cursoController.listar();
+        } else if (usuario.esProfesor() && usuario.getProfesorId() != null) {
+            cursos = cursoController.listarPorProfesor(usuario.getProfesorId());
+        } else {
+            cursos = new java.util.ArrayList<>();
+        }
+        for (Curso c : cursos) {
+            cmbCurso.addItem(c);
+            if (c.getId() == idCurso) cmbCurso.setSelectedItem(c);
+        }
+        if (cmbCurso.getSelectedItem() == null && cmbCurso.getItemCount() > 0) cmbCurso.setSelectedIndex(0);
     }
 
     private void initTable() {

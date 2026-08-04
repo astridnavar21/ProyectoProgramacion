@@ -10,6 +10,8 @@ import Model.Usuario;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 
 public class VistaUsuario extends JPanel {
     private final UsuarioController controller;
@@ -41,6 +43,20 @@ public class VistaUsuario extends JPanel {
         }
 
         initTable();
+        cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
+    }
+
+    public void recargar() {
+        if (usuario.esAdmin()) {
+            cargarComboProfesores();
+            cargarComboEstudiantes();
+        }
         cargarTabla();
     }
 
@@ -125,18 +141,26 @@ public class VistaUsuario extends JPanel {
     }
 
     private void cargarComboProfesores() {
+        Profesor seleccion = (Profesor) cmbProfesor.getSelectedItem();
+        int idSeleccion = seleccion != null ? seleccion.getId() : -1;
         DefaultComboBoxModel<Profesor> model = new DefaultComboBoxModel<>();
         for (Profesor p : profesorController.listar()) {
             model.addElement(p);
+            if (p.getId() == idSeleccion) model.setSelectedItem(p);
         }
+        if (model.getSelectedItem() == null && model.getSize() > 0) model.setSelectedItem(model.getElementAt(0));
         cmbProfesor.setModel(model);
     }
 
     private void cargarComboEstudiantes() {
+        Estudiante seleccion = (Estudiante) cmbEstudiante.getSelectedItem();
+        int idSeleccion = seleccion != null ? seleccion.getId() : -1;
         DefaultComboBoxModel<Estudiante> model = new DefaultComboBoxModel<>();
         for (Estudiante e : estudianteController.listar()) {
             model.addElement(e);
+            if (e.getId() == idSeleccion) model.setSelectedItem(e);
         }
+        if (model.getSelectedItem() == null && model.getSize() > 0) model.setSelectedItem(model.getElementAt(0));
         cmbEstudiante.setModel(model);
     }
 

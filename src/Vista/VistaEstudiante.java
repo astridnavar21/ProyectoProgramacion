@@ -7,6 +7,8 @@ import Model.Estudiante;
 import Model.Usuario;
 
 import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
 
 public class VistaEstudiante extends JPanel {
@@ -31,6 +33,16 @@ public class VistaEstudiante extends JPanel {
         setLayout(new BorderLayout(0, 10));
         initForm();
         initTable();
+        cargarTabla();
+        addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentShown(ComponentEvent e) {
+                recargar();
+            }
+        });
+    }
+
+    public void recargar() {
         cargarTabla();
     }
 
