@@ -69,7 +69,6 @@ public class VistaMatricula extends JPanel {
         gbc.insets = new Insets(3, 5, 3, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row 0: Estudiante | Curso
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Estudiante:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -82,7 +81,6 @@ public class VistaMatricula extends JPanel {
         cmbCurso = new JComboBox<>();
         fields.add(cmbCurso, gbc);
 
-        // Row 1: Fecha | Activo
         gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Fecha (yyyy-MM-dd):"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;

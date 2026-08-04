@@ -73,7 +73,6 @@ public class VistaCalificacion extends JPanel {
         gbc.insets = new Insets(3, 5, 3, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row 0: Estudiante | Curso
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Estudiante:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -86,7 +85,6 @@ public class VistaCalificacion extends JPanel {
         cmbCurso = new JComboBox<>();
         fields.add(cmbCurso, gbc);
 
-        // Row 1: Calificación
         gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Calificación (0-100):"), gbc);
         gbc.gridx = 1; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.WEST;

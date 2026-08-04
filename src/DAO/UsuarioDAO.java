@@ -181,7 +181,6 @@ public class UsuarioDAO implements IDAO<Usuario> {
         try {
             u.setNombreAsociado(rs.getString("nombre_asociado"));
         } catch (SQLException ignored) {
-            // columna nombre_asociado no existe en consultas sin JOIN
         }
         return u;
     }

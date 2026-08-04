@@ -101,7 +101,6 @@ public class VistaCurso extends JPanel {
 
         add(formPanel, BorderLayout.NORTH);
 
-        // Permisos
         boolean puedeEditar = usuario.esAdmin();
         btnNuevo.setEnabled(puedeEditar);
         btnGuardar.setEnabled(puedeEditar);

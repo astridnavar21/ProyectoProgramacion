@@ -69,7 +69,6 @@ public class VistaUsuario extends JPanel {
         gbc.insets = new Insets(3, 5, 3, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Fila 0: Usuario | Rol
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Usuario:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -81,7 +80,6 @@ public class VistaUsuario extends JPanel {
         cmbRol = new JComboBox<>(new String[]{"ADMIN", "PROFESOR", "ESTUDIANTE"});
         fields.add(cmbRol, gbc);
 
-        // Fila 1: Contraseña | Activo
         gbc.gridx = 0; gbc.gridy = 1; gbc.anchor = GridBagConstraints.EAST;
         fields.add(new JLabel("Contraseña:"), gbc);
         gbc.gridx = 1; gbc.anchor = GridBagConstraints.WEST;
@@ -92,7 +90,6 @@ public class VistaUsuario extends JPanel {
         chkActivo.setSelected(true);
         fields.add(chkActivo, gbc);
 
-        // Fila 2: Profesor / Estudiante (según rol)
         gbc.gridx = 0; gbc.gridy = 2; gbc.gridwidth = 1; gbc.anchor = GridBagConstraints.EAST;
         lblAsociado = new JLabel("Profesor:");
         fields.add(lblAsociado, gbc);
@@ -124,14 +121,11 @@ public class VistaUsuario extends JPanel {
 
         add(formPanel, BorderLayout.NORTH);
 
-        // Cargar datos en los combos
         cargarComboProfesores();
         cargarComboEstudiantes();
 
-        // Estado inicial: ADMIN seleccionado, ocultar combos de asociado
         actualizarVisibilidadAsociado();
 
-        // Eventos
         cmbRol.addActionListener(e -> actualizarVisibilidadAsociado());
         btnNuevo.addActionListener(e -> limpiarFormulario());
         btnGuardar.addActionListener(e -> guardar());
@@ -164,12 +158,6 @@ public class VistaUsuario extends JPanel {
         cmbEstudiante.setModel(model);
     }
 
-    /**
-     * Muestra/oculta el selector de profesor o estudiante según el rol seleccionado.
-     * ADMIN → oculta todo
-     * PROFESOR → muestra combo de profesores
-     * ESTUDIANTE → muestra combo de estudiantes
-     */
     private void actualizarVisibilidadAsociado() {
         String rol = (String) cmbRol.getSelectedItem();
         boolean esProfesor = "PROFESOR".equals(rol);
@@ -221,7 +209,6 @@ public class VistaUsuario extends JPanel {
             cmbRol.setSelectedItem(u.getRol());
             chkActivo.setSelected(u.isActivo());
 
-            // Seleccionar el profesor o estudiante correspondiente en el combo
             if (u.getProfesorId() != null) {
                 for (int i = 0; i < cmbProfesor.getItemCount(); i++) {
                     if (cmbProfesor.getItemAt(i).getId() == u.getProfesorId()) {
@@ -250,7 +237,6 @@ public class VistaUsuario extends JPanel {
 
         String rol = (String) cmbRol.getSelectedItem();
 
-        // Validar que se haya seleccionado profesor o estudiante según el rol
         if ("PROFESOR".equals(rol)) {
             if (cmbProfesor.getSelectedItem() == null) {
                 JOptionPane.showMessageDialog(this, "Debe seleccionar un profesor para el rol PROFESOR.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -272,7 +258,6 @@ public class VistaUsuario extends JPanel {
         }
         u.setRol(rol);
 
-        // Asignar profesorId o estudianteId según el rol
         if ("PROFESOR".equals(rol) && cmbProfesor.getSelectedItem() != null) {
             u.setProfesorId(((Profesor) cmbProfesor.getSelectedItem()).getId());
         } else if ("ESTUDIANTE".equals(rol) && cmbEstudiante.getSelectedItem() != null) {
@@ -324,7 +309,6 @@ public class VistaUsuario extends JPanel {
             txtPassword.setText("");
             cmbRol.setSelectedIndex(0);
             chkActivo.setSelected(true);
-            // Resetear combos al primer elemento
             if (cmbProfesor.getItemCount() > 0) cmbProfesor.setSelectedIndex(0);
             if (cmbEstudiante.getItemCount() > 0) cmbEstudiante.setSelectedIndex(0);
             actualizarVisibilidadAsociado();

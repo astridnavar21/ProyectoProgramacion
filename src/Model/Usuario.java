@@ -7,7 +7,7 @@ public class Usuario {
     private String rol;
     private Integer profesorId;
     private Integer estudianteId;
-    private String nombreAsociado; // solo para visualización en tabla
+    private String nombreAsociado;
     private boolean activo;
 
     public int getId() {

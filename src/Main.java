@@ -1,11 +1,8 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 import Controller.*;
 import DAO.Conexion;
 import Model.Usuario;
 import Vista.Login;
 import Vista.Menu;
-import Vista.VistaUsuario;
 
 import javax.swing.*;
 
