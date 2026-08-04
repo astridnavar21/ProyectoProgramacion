@@ -21,7 +21,7 @@ public class VistaCalificacion extends JPanel {
     private final Usuario usuario;
     private JTable table;
     private DefaultTableModel tableModel;
-    private static final String[] COLUMNAS = {"ID", "Estudiante", "Curso", "Calificación", "Fecha"};
+    private static final String[] COLUMNAS = {"ID", "Estudiante", "Curso", "Calificación"};
 
     private JComboBox<Estudiante> cmbEstudiante;
     private JComboBox<Curso> cmbCurso;
@@ -190,7 +190,7 @@ public class VistaCalificacion extends JPanel {
         for (Calificacion c : list) {
             tableModel.addRow(new Object[]{
                     c.getId(), c.getNombreEstudiante(), c.getNombreCurso(),
-                    c.getCalificacion(), c.getFechaRegistro() != null ? c.getFechaRegistro().toString().replace("T", " ") : ""
+                    c.getCalificacion()
             });
         }
     }
